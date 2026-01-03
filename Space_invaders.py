@@ -16,6 +16,8 @@ fps=60
 speeds=2
 speedb=7
 maxb=3
+bulletb=[]
+bulletr=[]
 #loading the spaceships
 red=pygame.image.load("spaceship_red.png")
 blue=pygame.image.load("spaceship_blue.png")
@@ -52,6 +54,16 @@ class ss(pygame.sprite.Sprite):
         if p==2:
             if self.rect.right>=700 or self.rect.left<=bor.right:
                 self.rect.move_ip(-speed,0)
+#function for drawing bullets
+def drawb():
+    for bullet in bulletb:
+        pygame.draw.rect(screen,"blue",bullet)
+        bullet.x-=speedb
+    for bullet in bulletr:
+        pygame.draw.rect(screen,"red",bullet)
+        bullet.x+=speedb
+redhit=pygame.USEREVENT+1
+bluehit=pygame.USEREVENT+2
 #creating the spaceship objects
 rso=ss(red,100,300)
 bso=ss(blue,550,300)
@@ -64,6 +76,13 @@ while run:
     for event in pygame.event.get():
         if event.type==QUIT:
             run=False
+        if event.type==KEYDOWN:
+            if event.key==K_LCTRL:
+                bullet=pygame.Rect(rso.rect.x+rso.rect.width,rso.rect.y+rso.rect.height//2,5,3)
+                bulletr.append(bullet)
+            if event.key==K_RCTRL:
+                bullet=pygame.Rect(bso.rect.x,bso.rect.y+bso.rect.height//2,5,3)
+                bulletb.append(bullet)
     keyp=pygame.key.get_pressed()
     #red movement
     if keyp[K_w]:
@@ -91,5 +110,6 @@ while run:
     screen.blit(redht,(10,20))
     screen.blit(blueht,(570,20))
     ssg.draw(screen)
+    drawb()
     pygame.display.update()
 pygame.quit()
