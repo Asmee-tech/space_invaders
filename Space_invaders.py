@@ -10,7 +10,7 @@ result=(99, 255, 51)
 border=(255,255,255)
 #font styles
 hfont=pygame.font.SysFont("lemon drop",30)
-wfont=pygame.font.SysFont("antrokas",50)
+wfont=pygame.font.SysFont("antrokas",100)
 #game constants
 fps=60
 speeds=2
@@ -18,7 +18,7 @@ speedb=7
 maxb=3
 bulletb=[]
 bulletr=[]
-#loading the spaceships
+#loading the spaces ships
 red=pygame.image.load("spaceship_red.png")
 blue=pygame.image.load("spaceship_blue.png")
 bg=pygame.image.load("galaxy_bg.jpg")
@@ -64,6 +64,32 @@ def drawb():
         bullet.x+=speedb
 redhit=pygame.USEREVENT+1
 bluehit=pygame.USEREVENT+2
+#function for bullet collision 
+def handle():
+    global bulletb,bulletr,blueh,redh
+    for bullet in bulletb:
+        if rso.rect.colliderect(bullet):
+            redh-=1
+            bulletb.remove(bullet)
+        elif bullet.x<0:
+            bulletb.remove(bullet)
+    for bullet in bulletr:
+        if bso.rect.colliderect(bullet):
+            blueh-=1
+            bulletr.remove(bullet)
+        elif bullet.x>700:
+            bullet.remove(bullet)
+    for bullet1 in bulletb:
+        for bullet2 in bulletr:
+            if bullet1.colliderect(bullet2):
+                bulletb.remove(bullet1)
+                bulletr.remove(bullet2)
+#function for winner text:
+def win(text):
+    text1=wfont.render(text,1,result)
+    screen.blit(text1,(200,250))
+    pygame.display.update()
+    pygame.time.delay(5000)
 #creating the spaceship objects
 rso=ss(red,100,300)
 bso=ss(blue,550,300)
@@ -83,6 +109,11 @@ while run:
             if event.key==K_RCTRL:
                 bullet=pygame.Rect(bso.rect.x,bso.rect.y+bso.rect.height//2,5,3)
                 bulletb.append(bullet)
+        #handeling custom hit event
+        if event.type==redhit:
+            redh-=1
+        if event.type==bluehit:
+            blueh-=1
     keyp=pygame.key.get_pressed()
     #red movement
     if keyp[K_w]:
@@ -111,5 +142,15 @@ while run:
     screen.blit(blueht,(570,20))
     ssg.draw(screen)
     drawb()
+    handle()
+    #checking for win condition
+    if redh<=-1:
+        text2="Blue Won!"
+        win(text2)
+        run=False
+    if blueh<=-1:
+        text3="Red Won!"
+        win(text3)
+        run=False
     pygame.display.update()
 pygame.quit()
